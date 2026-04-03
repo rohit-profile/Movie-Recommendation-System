@@ -3,37 +3,50 @@ import pickle
 import pandas as pd
 import requests
 import os
-import gdown  # added for Google Drive download
+import gdown
+import time
 
 app = Flask(__name__)
 
 # ----------------------------
-# STEP 1: Download large files from Google Drive if not exist
+# STEP 1: Google Drive download for large files
 # ----------------------------
-
 # similarity_model.pkl
+similarity_file = "similarity_model.pkl"
 similarity_url = "https://drive.google.com/uc?id=1r8lsfpqTDNbnGzyB3FZI9NXNpvWu2zic"
-if not os.path.exists("similarity_model.pkl"):
-    gdown.download(similarity_url, "similarity_model.pkl", quiet=False)
 
+if not os.path.exists(similarity_file):
+    print("Downloading similarity_model.pkl from Google Drive...")
+    gdown.download(similarity_url, similarity_file, quiet=False)
+    time.sleep(1)
 
+# movies_model.pkl (optional, if large, put on Drive)
+movies_file = "movies_model.pkl"
+# movies_url = "https://drive.google.com/uc?id=YOUR_MOVIES_FILE_ID"
+# if not os.path.exists(movies_file):
+#     print("Downloading movies_model.pkl from Google Drive...")
+#     gdown.download(movies_url, movies_file, quiet=False)
+#     time.sleep(1)
 
 # ----------------------------
 # STEP 2: Load data
 # ----------------------------
-movies_dict = pickle.load(open('movies_model.pkl', 'rb'))
+movies_dict = pickle.load(open(movies_file, 'rb'))
 movies_list = pd.DataFrame(movies_dict)
-similarity = pickle.load(open('similarity_model.pkl', 'rb'))
+similarity = pickle.load(open(similarity_file, 'rb'))
 
 # ----------------------------
 # STEP 3: TMDB Poster Fetch
 # ----------------------------
 def fetch_poster(movie_id):
-    response = requests.get(
-        f'https://api.themoviedb.org/3/movie/{movie_id}?api_key=7db733e108a1ed591f94cd66d160b97b&language=en-US'
-    )
-    data = response.json()
-    return "https://image.tmdb.org/t/p/w500/" + data['poster_path']
+    try:
+        response = requests.get(
+            f'https://api.themoviedb.org/3/movie/{movie_id}?api_key=7db733e108a1ed591f94cd66d160b97b&language=en-US'
+        )
+        data = response.json()
+        return "https://image.tmdb.org/t/p/w500/" + data['poster_path']
+    except:
+        return "https://via.placeholder.com/500x750?text=No+Image"
 
 # ----------------------------
 # STEP 4: Recommend Function
@@ -76,9 +89,8 @@ def index():
     )
 
 # ----------------------------
-# STEP 6: Run App
+# STEP 6: Run App (Render compatible)
 # ----------------------------
 if __name__ == '__main__':
-    # Render uses PORT environment variable
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
