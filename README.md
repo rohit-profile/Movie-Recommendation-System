@@ -62,28 +62,7 @@ This system is **scalable, intuitive, and data-driven**, suitable for real-world
 
 ---
 
-## Installation
 
-1. **Clone the repository:**
-```bash
-git clone https://github.com/username/movie-recommender-system.git
-Navigate to the project folder:
-cd movie-recommender-system
-Create a virtual environment:
-python -m venv venv
-Activate the virtual environment:
-# Windows
-venv\Scripts\activate
-
-# macOS/Linux
-source venv/bin/activate
-Install dependencies:
-pip install -r requirements.txt
-Usage
-Run the main application:
-python app.py
-Input your favorite movies or ratings via CLI or Web interface.
-View recommended movies tailored to your preferences.
 
 Example CLI Flow:
 
